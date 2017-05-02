@@ -1,5 +1,5 @@
 ig.module(
-    'plugins.soldier-texture'
+    'plugins.anims.soldier-texture'
 )
     .requires(
     )

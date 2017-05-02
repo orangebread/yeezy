@@ -281,7 +281,10 @@ ig.Input = ig.Class.extend({
 	state: function( action ) {
 		return this.actions[action];
 	},
-	
+
+	clearState: function(action) {
+		this.actions[action] = false;
+	},
 	
 	pressed: function( action ) {
 		return this.presses[action];

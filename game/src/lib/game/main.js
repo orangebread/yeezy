@@ -27,6 +27,7 @@ ig.module(
                 ig.input.bind(ig.KEY.S, 'down');
                 ig.input.initMouse();
                 ig.input.bind( ig.KEY.MOUSE1, 'attack');
+                ig.input.bind( ig.KEY.MOUSE2, 'shoot');
                 ig.input.bind( ig.KEY.Z, 'minorbull');
 
                 this.loadLevel(LevelWorld);
