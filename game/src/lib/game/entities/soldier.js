@@ -3,6 +3,7 @@ ig.module(
 ).requires(
     'impact.entity',
 
+    'plugins.entity',
     'plugins.texture-atlas',
     'plugins.anims.soldier-texture',
     'plugins.anims.soldier-attack'
@@ -26,12 +27,17 @@ ig.module(
         soldierAttackImage: new ig.Image('media/entity/player/soldier-attack.png'),
 
         animationSpeed: .1,
-        attackSpeed: .1,
+        shootAttackSpeed: .2,
+        meleeAttackSpeed: .1,
+        angleState: 'down',
+        isBusy: null,
+        moveTimer: new ig.Timer(),
+        moveDelay: 0.2,
         flip: false,
 
         init: function( x, y, settings ) {
             this.parent( x, y, settings );
-
+            this.isBusy = false;
             this.soldierMoveAtlas = new ig.TextureAtlas(this.soldierMoveImage, new ig.SoldierTexture().sprites);
             this.soldierAttackAtlas = new ig.TextureAtlas(this.soldierAttackImage, new ig.SoldierAttack().sprites);
 
@@ -58,48 +64,48 @@ ig.module(
                 false);
 
             //Attack - Melee
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeDown', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeDown', this.meleeAttackSpeed,
                 ['soldier-melee-down1.png', 'soldier-melee-down2.png', 'soldier-melee-down3.png',
                     'soldier-melee-down4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeDownLeft', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeDownLeft', this.meleeAttackSpeed,
                 ['soldier-melee-down-left1.png', 'soldier-melee-down-left2.png', 'soldier-melee-down-left3.png',
                     'soldier-melee-down-left4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeDownRight', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeDownRight', this.meleeAttackSpeed,
                 ['soldier-melee-down-right1.png', 'soldier-melee-down-right2.png', 'soldier-melee-down-right3.png',
                     'soldier-melee-down-right4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeLeft', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeLeft', this.meleeAttackSpeed,
                 ['soldier-melee-left1.png', 'soldier-melee-left2.png', 'soldier-melee-left3.png',
                     'soldier-melee-left4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeRight', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeRight', this.meleeAttackSpeed,
                 ['soldier-melee-right1.png', 'soldier-melee-right2.png', 'soldier-melee-right3.png',
                     'soldier-melee-right4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeUp', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeUp', this.meleeAttackSpeed,
                 ['soldier-melee-up1.png', 'soldier-melee-up2.png', 'soldier-melee-up3.png',
                     'soldier-melee-up4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeUpLeft', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeUpLeft', this.meleeAttackSpeed,
                 ['soldier-melee-up-left1.png', 'soldier-melee-up-left2.png', 'soldier-melee-up-left3.png',
                     'soldier-melee-up-left4.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeUpRight', this.attackSpeed,
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'meleeUpRight', this.meleeAttackSpeed,
                 ['soldier-melee-up-right1.png', 'soldier-melee-up-right2.png', 'soldier-melee-up-right3.png',
                     'soldier-melee-up-right4.png'], false);
 
             //Attack - Shoot
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootDown', this.attackSpeed,
-                ['soldier-shoot-down1.png', 'soldier-shoot-down2.png', 'soldier-shoot-down3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootDownRightBack', this.attackSpeed,
-                ['soldier-shoot-down-right-back1.png', 'soldier-shoot-down-right-back2.png', 'soldier-shoot-down-right-back3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootDownRightFront', this.attackSpeed,
-                ['soldier-shoot-down-right-front1.png', 'soldier-shoot-down-right-front2.png', 'soldier-shoot-down-right-front3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootRightBack', this.attackSpeed,
-                ['soldier-shoot-right-back1.png', 'soldier-shoot-right-back2.png', 'soldier-shoot-right-back3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootRightFront', this.attackSpeed,
-                ['soldier-shoot-right-front1.png', 'soldier-shoot-right-front2.png', 'soldier-shoot-right-front3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootUp', this.attackSpeed,
-                ['soldier-shoot-up1.png', 'soldier-shoot-up2.png', 'soldier-shoot-up3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootUpRightBack', this.attackSpeed,
-                ['soldier-shoot-up-right-back1.png', 'soldier-shoot-up-right-back2.png', 'soldier-shoot-up-right-back3.png'], false);
-            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootUpRightFront', this.attackSpeed,
-                ['soldier-shoot-up-right-front1.png', 'soldier-shoot-up-right-front2.png', 'soldier-shoot-up-right-front3.png'], false);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootDown', this.shootAttackSpeed,
+                ['soldier-shoot-down1.png', 'soldier-shoot-down2.png', 'soldier-shoot-down3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootDownRightBack', this.shootAttackSpeed,
+                ['soldier-shoot-down-right-back1.png', 'soldier-shoot-down-right-back2.png', 'soldier-shoot-down-right-back3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootDownRightFront', this.shootAttackSpeed,
+                ['soldier-shoot-down-right-front1.png', 'soldier-shoot-down-right-front2.png', 'soldier-shoot-down-right-front3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootRightBack', this.shootAttackSpeed,
+                ['soldier-shoot-right-back1.png', 'soldier-shoot-right-back2.png', 'soldier-shoot-right-back3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootRightFront', this.shootAttackSpeed,
+                ['soldier-shoot-right-front1.png', 'soldier-shoot-right-front2.png', 'soldier-shoot-right-front3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootUp', this.shootAttackSpeed,
+                ['soldier-shoot-up1.png', 'soldier-shoot-up2.png', 'soldier-shoot-up3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootUpRightBack', this.shootAttackSpeed,
+                ['soldier-shoot-up-right-back1.png', 'soldier-shoot-up-right-back2.png', 'soldier-shoot-up-right-back3.png'], true);
+            this.addTextureAtlasAnim(this.soldierAttackAtlas, 'shootUpRightFront', this.shootAttackSpeed,
+                ['soldier-shoot-up-right-front1.png', 'soldier-shoot-up-right-front2.png', 'soldier-shoot-up-right-front3.png'], true);
 
             // Idle
             this.addTextureAtlasAnim(this.soldierMoveAtlas, 'idleUp', this.animationSpeed, ['soldier-idle1.png'], false);
@@ -129,17 +135,11 @@ ig.module(
             this.parent(x, y, settings);
         },
 
+        toAngle: function( x ) {
+            return (x > 0 ? x : (2*Math.PI + x)) * 360 / (2*Math.PI);
+        },
+
         update: function() {
-
-            // Mouse Angle
-            var mx = ig.input.mouse.x + ig.game.screen.x;
-            var my = ig.input.mouse.y + ig.game.screen.y;
-            var mouseAngle = Math.atan2(
-                my - (this.pos.y + this.size.y/2),
-                mx - (this.pos.x + this.size.x/2)
-            );
-            this.mouseangle = mouseAngle;
-
 
             // Player Movement
             var state_right = ig.input.state('right');
@@ -151,6 +151,7 @@ ig.module(
 
             // Left
             if (state_left && !state_up && !state_down) {
+                this.isBusy = true;
                 this.flip = true;
                 this.vel.x = -this.speed;
                 this.vel.y = 0;
@@ -158,6 +159,7 @@ ig.module(
             }
             // Right
             else if (state_right && !state_up && !state_down) {
+                this.isBusy = true;
                 this.flip = false;
                 this.vel.x = this.speed;
                 this.vel.y = 0;
@@ -165,6 +167,7 @@ ig.module(
             }
             // Up
             else if (state_up && !state_left && !state_right) {
+                this.isBusy = true;
                 this.flip = false;
                 this.vel.y = -this.speed;
                 this.vel.x = 0;
@@ -172,6 +175,7 @@ ig.module(
             }
             // Up-Right
             else if (state_up && state_right && !state_down) {
+                this.isBusy = true;
                 this.flip = false;
                 this.vel.y = -this.speed * .707;
                 this.vel.x = this.speed * .707;
@@ -179,6 +183,7 @@ ig.module(
             }
             // Up-Left
             else if (state_up && state_left && !state_down) {
+                this.isBusy = true;
                 this.flip = true;
                 this.vel.y = -this.speed * .707;
                 this.vel.x = -this.speed * .707;
@@ -186,6 +191,7 @@ ig.module(
             }
             // Down
             else if (state_down && !state_left && !state_right) {
+                this.isBusy = true;
                 this.flip = false;
                 this.vel.y = this.speed;
                 this.vel.x = 0;
@@ -193,6 +199,7 @@ ig.module(
             }
             // Down-Right
             else if (state_down && state_right && !state_up) {
+                this.isBusy = true;
                 this.flip = false;
                 this.vel.y = this.speed * .707;
                 this.vel.x = this.speed * .707;
@@ -200,35 +207,191 @@ ig.module(
             }
             // Down-Left
             else if (state_down && state_left && !state_up ) {
+                this.isBusy = true;
                 this.flip = true;
                 this.vel.y = this.speed * .707;
                 this.vel.x = -this.speed * .707;
                 this.currentAnim = this.anims.downRight;
             } else {
+                if (!ig.input.state('shoot') || !ig.input.state('attack')) {
+                    this.isBusy = false;
+                }
                 this.vel.x = 0;
                 this.vel.y = 0;
             }
 
-            // Idle
-            if (ig.input.released('right')) {
-                this.currentAnim = this.anims.idleRight;
-            } else if (ig.input.released('left')) {
-                this.flip = true;
-                this.currentAnim = this.anims.idleRight;
-            } if (ig.input.released('up')) {
-                this.currentAnim = this.anims.idleUp;
-            } if (ig.input.released('down')) {
-                this.currentAnim = this.anims.idleDown;
+            var radians = Math.atan2(this.pos.y - ig.input.mouse.y, this.pos.x - ig.input.mouse.x);
+            var dest = this.toAngle(radians);
+            var angle = this.angleToMouse();
+
+            // ATTACK - SHOOT
+            if (pressed_shoot) {
+                this.vel.x = 0;
+                this.vel.y = 0;
+                this.isBusy = true;
+                this.moveTimer.reset();
+
+                //Down-Left
+                if (dest >= 290 && dest < 350) {
+                    console.log('down left');
+                    this.flip = true;
+                    this.currentAnim = this.anims.shootDownRightFront;
+                }
+                // down 1.3 < x < 1.7
+                else if (dest >= 260 && dest < 290) {
+                    console.log('down');
+                    this.flip = false;
+                    this.currentAnim = this.anims.shootDown;
+                }
+                // downright 0.1 <= x < 1.3
+                else if (dest >= 190.0 && dest < 260.0) {
+                    console.log('down right');
+                    this.flip = false;
+                    this.currentAnim = this.anims.shootDownRightFront;
+                }
+                // right -.1 <= x < 0 || 0 < x < 0.1
+                else if (dest >= 170.0 && dest < 190.0) {
+                    console.log('right');
+                    this.flip = false;
+                    this.currentAnim = this.anims.shootRightFront;
+                }
+                // upright -1.3 <= x < -.1
+                else if (dest >= 100.0 && dest < 170.0) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.shootUpRightFront;
+                }
+                // up -1.7 <= x < -1.3
+                else if (dest >= 80.0 && dest < 100) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.shootUp;
+                }
+                // upleft -2.9 <= x < -1.7
+                else if (dest >= 10.0 && dest < 80.0) {
+                    this.flip = true;
+                    this.currentAnim = this.anims.shootUpRightBack;
+                }
+                // left -2.9 < x -3.0 || 3 < 2.9
+                else if ((dest >= 0 && dest < 10.0) || (dest >= 350.0 && dest <= 360)) {
+                    this.flip = true;
+                    this.currentAnim = this.anims.shootRightFront;
+                }
+
+                // Spawn Bullet
+                ig.game.socket.emit('spawnbullet',1,this.gamename,this.mouseangle);
+                ig.game.spawnEntity(EntityBullet, this.pos.x + 30, this.pos.y + 30, {flip:this.flip,bullettype:1, angle: angle});
+
+                setTimeout(function() {
+                    this.isBusy = false;
+                }, 3000);
+
+            }
+
+            // ATTACK - MELEE
+            if (pressed_attack) {
+                this.vel.x = 0;
+                this.vel.y = 0;
+                this.isBusy = true;
+                this.moveTimer.reset();
+
+                //Down-Left
+                if (dest >= 290 && dest < 350) {
+                    this.currentAnim = this.anims.meleeDownLeft;
+                }
+                // down 1.3 < x < 1.7
+                else if (dest >= 260 && dest < 290) {
+                    this.currentAnim = this.anims.meleeDown;
+                }
+                // downright 0.1 <= x < 1.3
+                else if (dest >= 190.0 && dest < 260.0) {
+                    this.currentAnim = this.anims.meleeDownRight;
+                }
+                // right -.1 <= x < 0 || 0 < x < 0.1
+                else if (dest >= 170.0 && dest < 190.0) {
+                    this.currentAnim = this.anims.meleeRight;
+                }
+                // upright -1.3 <= x < -.1
+                else if (dest >= 100.0 && dest < 170.0) {
+                    this.currentAnim = this.anims.meleeUpRight;
+                }
+                // up -1.7 <= x < -1.3
+                else if (dest >= 80.0 && dest < 100) {
+                    // this.currentAnim = this.anims.meleeUp;
+                    this.currentAnim = this.anims.meleeUp.rewind();
+                }
+                // upleft -2.9 <= x < -1.7
+                else if (dest >= 10.0 && dest < 80.0) {
+                    this.flip = true;
+                    // this.currentAnim = this.anims.meleeUpRight;
+                    this.currentAnim = this.anims.meleeRight.rewind();
+                }
+                // left -2.9 < x -3.0 || 3 < 2.9
+                else if ((dest >= 0 && dest < 10.0) || (dest >= 350.0 && dest <= 360)) {
+                    this.flip = true;
+                    // this.currentAnim = this.anims.meleeRight;
+                    this.currentAnim = this.anims.meleeRight.rewind();
+
+                }
+                // this.currentAnim = this.anims.meleeDownLeft.rewind();
+                // this.currentAnim = this.anims.meleeDown.rewind();
+                // this.currentAnim = this.anims.meleeDownRight.rewind();
+                // this.currentAnim = this.anims.meleeUp.rewind();
+                // this.currentAnim = this.anims.meleeUpRight.rewind();
+                // this.currentAnim = this.anims.meleeUpLeft.rewind();
+                // this.currentAnim = this.anims.meleeLeft.rewind();
+                // this.currentAnim = this.anims.meleeRight.rewind();
+                // setTimeout(function() {
+                //     this.isBusy = false;
+                // }, 3000);
+
+                // Spawn Bullet
+                // ig.game.socket.emit('spawnbullet',1,this.gamename,this.mouseangle);
+                // ig.game.spawnEntity(EntityBullet, this.pos.x + 30, this.pos.y + 30, {flip:this.flip,bullettype:1, angle: angle});
             }
 
             this.currentAnim.flip.x = this.flip;
 
-
-
-            // ATTACK
-            if (pressed_shoot){
-                ig.game.socket.emit('spawnbullet',1,this.gamename,this.mouseangle);
-                ig.game.spawnEntity(EntityBullet, this.pos.x + 30, this.pos.y + 30, {flip:this.flip,bullettype:1});
+            // TEST IDLE
+            if (this.isBusy == false && this.moveTimer.delta() > this.moveDelay) {
+                //Down-Left
+                if (dest >= 290 && dest < 350) {
+                    this.flip = true;
+                    this.currentAnim = this.anims.idleDownRight;
+                }
+                // down 1.3 < x < 1.7
+                else if (dest >= 260 && dest < 290) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.idleDown;
+                }
+                // downright 0.1 <= x < 1.3
+                else if (dest >= 190.0 && dest < 260.0) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.idleDownRight;
+                }
+                // right -.1 <= x < 0 || 0 < x < 0.1
+                else if (dest >= 170.0 && dest < 190.0) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.idleRight;
+                }
+                // upright -1.3 <= x < -.1
+                else if (dest >= 100.0 && dest < 170.0) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.idleUpRight;
+                }
+                // up -1.7 <= x < -1.3
+                else if (dest >= 80.0 && dest < 100) {
+                    this.flip = false;
+                    this.currentAnim = this.anims.idleUp;
+                }
+                // upleft -2.9 <= x < -1.7
+                else if (dest >= 10.0 && dest < 80.0) {
+                    this.flip = true;
+                    this.currentAnim = this.anims.idleUpRight;
+                }
+                // left -2.9 < x -3.0 || 3 < 2.9
+                else if ((dest >= 0 && dest < 10.0) || (dest >= 350.0 && dest <= 360)) {
+                    this.flip = true;
+                    this.currentAnim = this.anims.idleRight;
+                }
             }
 
             if (this.nettime < 1){

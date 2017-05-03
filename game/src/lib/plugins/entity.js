@@ -3,7 +3,7 @@
  * @author   Jonathan Commins
  * @email    joncom@gmail.com
  */
-ig.module('plugins.joncom.essentials.entity')
+ig.module('plugins.entity')
 .requires('impact.entity')
 .defines(function() {
     ig.Entity.inject({

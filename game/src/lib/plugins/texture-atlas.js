@@ -25,6 +25,10 @@ ig.module(
                 }
 
                 return a;
+            },
+
+            sequenceLength: function() {
+                return this.sequence.length;
             }
         });
 
