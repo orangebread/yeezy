@@ -118,7 +118,7 @@ ig.Game = ig.Class.extend({
 		}
 		return a;
 	},
-	
+
 	
 	spawnEntity: function( type, x, y, settings ) {
 		var entityClass = typeof(type) === 'string'
