@@ -4,29 +4,36 @@ ig.module( 'game.entities.bullet')
         'plugins.anims.bullet')
     .defines(function() {
         EntityBullet = ig.Entity.extend({
-            size: {x: 10, y: 10},
+            // size: {x: 10, y: 10},
             offset: {x: 20, y: 20},
-            maxVel: {x: 600, y: 600},
-            buttlettype: 1,
-            angle: 0,
+            maxVel: {x: 400, y: 400},
+            pivot: null,
+            angle: null,
 
             type: ig.Entity.TYPE.A,
             checkAgainst: ig.Entity.TYPE.B, // Check Against B - our evil enemy group
             collides: ig.Entity.COLLIDES.NONE,
 
+            buttlettype: 1,
             bulletAtlas: null,
             bulletImage: new ig.Image('media/bullet.png'),
             animationSpeed: 0.1,
 
+
             init: function(x, y, settings) {
                 this.parent(x, y, settings);
 
+                // Initialize animation
                 this.initAnim();
 
-                this.vel.x = Math.cos(this.angle) * 600;
-                this.vel.y = Math.sin(this.angle) * 600;
+                this.vel.x = Math.cos(this.angle) * this.maxVel.x;
+                this.vel.y = Math.sin(this.angle) * this.maxVel.y;
+
+                // Reference to bullet
+                ig.game.bullet = this;
             },
 
+            // Collison handler
             handleMovementTrace: function( res ) {
                 this.parent( res );
                 if (res.collision.x || res.collision.y) {
@@ -37,9 +44,12 @@ ig.module( 'game.entities.bullet')
             // Initialize functions
             initAnim: function() {
                 this.bulletAtlas = new ig.TextureAtlas(this.bulletImage, new ig.BulletTextures().sprites);
-
                 this.addTextureAtlasAnim(this.bulletAtlas, 'idle', this.animationSpeed,
-                    ['bullet1.png', 'bullet2.png', 'bullet3.png', 'bullet4.png'], false);
+                    ['bullet.png', 'bullet2.png', 'bullet3.png', 'bullet4.png'], false);
+
+                this.currentAnim.pivot.x = this.currentAnim;
+                this.currentAnim.pivot.y = 0;
+                this.currentAnim.angle = this.angle + Math.PI / 2;
             }
 
             /*

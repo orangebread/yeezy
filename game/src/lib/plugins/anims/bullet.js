@@ -12,7 +12,7 @@ ig.module(
                 "frames": [
 
                     {
-                        "filename": "bullet1.png",
+                        "filename": "bullet.png",
                         "frame": {"x":0,"y":0,"w":12,"h":16},
                         "rotated": false,
                         "trimmed": false,
