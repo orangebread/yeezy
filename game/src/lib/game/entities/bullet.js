@@ -38,6 +38,15 @@ ig.module( 'game.entities.bullet')
                 this.parent( res );
                 if (res.collision.x || res.collision.y) {
                     this.kill();
+
+                    // ig.game.spawnEntity(EntityBulletEffects, this.pos.x + 30, this.pos.y + 30, {flip: this.flip, angle: this.angleToMouse()} );
+                    ig.game.spawnEntity(EntityBulletEffects, this.pos.x + 30, this.pos.y + 30);
+                    ig.game.socket.send('client:spawnSimpleEntity', {
+                        entityType: "EntityBulletEffects",
+                        x: this.pos.x + 30,
+                        y: this.pos.y + 30,
+                        settings: {flip: this.flip, angle: this.angleToMouse()}
+                    });
                 }
             },
 

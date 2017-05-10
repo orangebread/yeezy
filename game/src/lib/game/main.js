@@ -10,7 +10,8 @@ ig.module(
     'plugins.socket-client',
 
     'game.entities.soldier',
-    'game.entities.bullet'
+    'game.entities.bullet',
+    'game.entities.bullet-effects'
 
 
 ).defines(function(){
